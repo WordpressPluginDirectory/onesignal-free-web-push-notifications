@@ -27,7 +27,7 @@ function admin_files()
 }
 
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-  if (isset($_POST["submit"])) {
+  if (isset($_POST["submit"]) && $_POST["submit"] === "Save Settings") {
     // Get existing settings with default values
     $onesignal_settings = get_option('OneSignalWPSetting', onesignal_get_default_settings());
 
@@ -47,9 +47,13 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
         $onesignal_settings['allowed_custom_post_types'] = sanitize_text_field($_POST['allowed_custom_post_types']);
     }
 
-    // Save the auto send notifications setting
+    // Save the auto send notifications setting for posts
     $auto_send = isset($_POST['onesignal_auto_send']) ? 1 : 0;
     $onesignal_settings['notification_on_post'] = $auto_send;
+
+    // Save the auto send notifications setting for pages
+    $auto_send_pages = isset($_POST['onesignal_auto_send_pages']) ? 1 : 0;
+    $onesignal_settings['notification_on_page'] = $auto_send_pages;
 
     // Save the notification on post from plugin setting
     $notification_on_post_from_plugin = isset($_POST['notification_on_post_from_plugin']) ? 1 : 0;
@@ -71,6 +75,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
 function onesignal_get_default_settings() {
     return array(
         'notification_on_post' => 0,
+        'notification_on_page' => 0,
         'notification_on_post_from_plugin' => 0,
         'send_to_mobile_platforms' => 0
     );
@@ -208,7 +213,17 @@ function onesignal_admin_page()
           <input id="auto-send" type="checkbox" name="onesignal_auto_send"
                  <?php echo (!empty($settings['notification_on_post'])) ? 'checked' : ''; ?>>
           <span class="checkbox"></span>
-          Automatically send notifications when a post is published or updated
+          Automatically send notifications when a post is published
+        </label>
+      </div>
+
+      <!-- Auto Send for Pages Checkbox -->
+      <div class="checkbox-wrapper auto-send-pages">
+        <label for="auto-send-pages">
+          <input id="auto-send-pages" type="checkbox" name="onesignal_auto_send_pages"
+                 <?php echo (!empty($settings['notification_on_page'])) ? 'checked' : ''; ?>>
+          <span class="checkbox"></span>
+          Automatically send notifications when a page is published
         </label>
       </div>
 
